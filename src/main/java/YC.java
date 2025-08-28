@@ -4,7 +4,7 @@ public class YC {
         String bot_Name = "YC";
         Scanner scanner = new Scanner(System.in);
         String userCommand;
-        String[] commandList = new String[100];
+        Task[] commandList = new Task[100];
         int totalCommands = 0;
 
         System.out.println("\t" + "____________________________________________________________");
@@ -23,15 +23,35 @@ public class YC {
             if (userCommand.equalsIgnoreCase("list")) {
                 System.out.println("\t" + "____________________________________________________________");
                 for  (int i = 0; i < totalCommands; i++) {
-                    System.out.println("\t" + (i+1) + ". "+ commandList[i]);
+                    System.out.println("\t" + (i+1) + ".[" + commandList[i].getStatusIcon() + "] " +
+                            commandList[i].getDescription());
                 }
                 System.out.println("\t" + "____________________________________________________________" + "\n");
             }
+
+            else if (userCommand.toLowerCase().startsWith("mark")) {
+                int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
+                commandList[taskIndex].markAsDone();
+                System.out.println("\t" + "____________________________________________________________");
+                System.out.println("\t" + "Nice! I've marked this task as done:");
+                System.out.println("\t\t" + "[X] " + commandList[taskIndex].getDescription());
+                System.out.println("\t" + "____________________________________________________________" + "\n");
+            }
+
+            else if (userCommand.toLowerCase().startsWith("unmark")) {
+                int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
+                commandList[taskIndex].markAsNotDone();
+                System.out.println("\t" + "____________________________________________________________");
+                System.out.println("\t" + "OK, I've marked this task as not done yet:");
+                System.out.println("\t\t" + "[ ] " + commandList[taskIndex].getDescription());
+                System.out.println("\t" + "____________________________________________________________" + "\n");
+            }
+
             else {
-                commandList[totalCommands] = userCommand;
+                commandList[totalCommands] = new Task(userCommand);
                 totalCommands++;
                 System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "added: " + userCommand + "\n");
+                System.out.println("\t" + "added: " + userCommand);
                 System.out.println("\t" + "____________________________________________________________" + "\n");
             }
 
