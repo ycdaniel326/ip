@@ -7,17 +7,12 @@ public class YC {
         Task[] commandList = new Task[100];
         int totalCommands = 0;
 
-        System.out.println("\t" + "____________________________________________________________");
-        System.out.println("\t" + "Hello! I'm " + bot_Name);
-        System.out.println("\t" + "What can I do for you?");
-        System.out.println("\t" + "____________________________________________________________" + "\n");
+        displayWelcomeMessage(bot_Name);
 
         while (true) {
             userCommand = scanner.nextLine();
             if (userCommand.equalsIgnoreCase("bye")) {
-                System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "Bye. Hope to see you again soon!");
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                displayByeMessage();
                 break;
             }
             if (userCommand.equalsIgnoreCase("list")) {
@@ -56,5 +51,19 @@ public class YC {
             }
 
         }
+    }
+
+
+    private static void displayWelcomeMessage(String bot_Name) {
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "Hello! I'm " + bot_Name);
+        System.out.println("\t" + "What can I do for you?");
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
+    private static void displayByeMessage() {
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "Bye. Hope to see you again soon!");
+        System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 }
