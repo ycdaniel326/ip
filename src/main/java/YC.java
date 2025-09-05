@@ -17,86 +17,38 @@ public class YC {
                 break;
             }
             if (userCommand.equalsIgnoreCase("list")) {
-                System.out.println("\t" + "____________________________________________________________");
-                for  (int i = 0; i < totalCommands; i++) {
-                    System.out.println("\t" + (i+1) + commandList[i].toString());
-                }
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                displayList(totalCommands, commandList);
             }
 
             else if (userCommand.toLowerCase().startsWith("mark")) {
-                int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
-                commandList[taskIndex].markAsDone();
-                System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "Nice! I've marked this task as done:");
-                System.out.println("\t\t" + commandList[taskIndex].toString());
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                MarkTask(userCommand, commandList);
             }
 
             else if (userCommand.toLowerCase().startsWith("unmark")) {
-                int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
-                commandList[taskIndex].markAsNotDone();
-                System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "OK, I've marked this task as not done yet:");
-                System.out.println("\t\t" + commandList[taskIndex].toString());
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                UnmarkTask(userCommand, commandList);
             }
 
             else if  (userCommand.toLowerCase().startsWith("todo")) {
                 // index 5 indicated the starting position of the task description
-                String description = userCommand.substring(5);
-                commandList[totalCommands] = new Todo(description);
-                System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "Got it. I've added this task:");
-                System.out.println("\t\t" + commandList[totalCommands].toString());
-                totalCommands++;
-                System.out.println("\t" + "Now you have "+ totalCommands + " tasks in the list.");
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                totalCommands = ProcessTodo(userCommand, commandList, totalCommands);
             }
 
             else if  (userCommand.toLowerCase().startsWith("deadline")) {
                 // index 9 indicated the starting position of the task description
-                String fullDescription = userCommand.substring(9);
-                String[] descriptionParts =  fullDescription.split(" /by ");
-                String description = descriptionParts[0];
-                String by = descriptionParts[1];
-                commandList[totalCommands] = new Deadline(description, by);
-                System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "Got it. I've added this task:");
-                System.out.println("\t\t" + commandList[totalCommands].toString());
-                totalCommands++;
-                System.out.println("\t" + "Now you have "+ totalCommands + " tasks in the list.");
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                totalCommands = ProcessDeadline(userCommand, commandList, totalCommands);
             }
 
             else if  (userCommand.toLowerCase().startsWith("event")) {
                 // index 6 indicated the starting position of the task description
-                String fullDescription = userCommand.substring(6);
-                String[] descriptionPart1 =  fullDescription.split(" /from ");
-                String description = descriptionPart1[0];
-                String[] descriptionPart2 = descriptionPart1[1].split(" /to ");
-                String from = descriptionPart2[0];
-                String to = descriptionPart2[1];
-                commandList[totalCommands] = new Event(description, from, to);
-                System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "Got it. I've added this task:");
-                System.out.println("\t\t" + commandList[totalCommands].toString());
-                totalCommands++;
-                System.out.println("\t" + "Now you have "+ totalCommands + " tasks in the list.");
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                totalCommands = ProcessEvent(userCommand, commandList, totalCommands);
             }
 
             else {
-                commandList[totalCommands] = new Task(userCommand);
-                totalCommands++;
-                System.out.println("\t" + "____________________________________________________________");
-                System.out.println("\t" + "added: " + userCommand);
-                System.out.println("\t" + "____________________________________________________________" + "\n");
+                totalCommands = AddTask(commandList, totalCommands, userCommand);
             }
 
         }
     }
-
 
     private static void displayWelcomeMessage(String botName) {
         System.out.println("\t" + "____________________________________________________________");
@@ -109,5 +61,79 @@ public class YC {
         System.out.println("\t" + "____________________________________________________________");
         System.out.println("\t" + "Bye. Hope to see you again soon!");
         System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
+    private static void displayList(int totalCommands, Task[] commandList) {
+        System.out.println("\t" + "____________________________________________________________");
+        for  (int i = 0; i < totalCommands; i++) {
+            System.out.println("\t" + (i+1) + commandList[i].toString());
+        }
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
+    private static void MarkTask(String userCommand, Task[] commandList) {
+        int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
+        commandList[taskIndex].markAsDone();
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "Nice! I've marked this task as done:");
+        System.out.println("\t\t" + commandList[taskIndex].toString());
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
+    private static void UnmarkTask(String userCommand, Task[] commandList) {
+        int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
+        commandList[taskIndex].markAsNotDone();
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "OK, I've marked this task as not done yet:");
+        System.out.println("\t\t" + commandList[taskIndex].toString());
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
+    private static int displayAddedCommand(Task[] commandList, int totalCommands) {
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "Got it. I've added this task:");
+        System.out.println("\t\t" + commandList[totalCommands].toString());
+        totalCommands++;
+        System.out.println("\t" + "Now you have "+ totalCommands + " tasks in the list.");
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+        return totalCommands;
+    }
+
+    private static int ProcessTodo(String userCommand, Task[] commandList, int totalCommands) {
+        String description = userCommand.substring(5);
+        commandList[totalCommands] = new Todo(description);
+        totalCommands = displayAddedCommand(commandList, totalCommands);
+        return totalCommands;
+    }
+
+    private static int ProcessDeadline(String userCommand, Task[] commandList, int totalCommands) {
+        String fullDescription = userCommand.substring(9);
+        String[] descriptionParts =  fullDescription.split(" /by ");
+        String description = descriptionParts[0];
+        String by = descriptionParts[1];
+        commandList[totalCommands] = new Deadline(description, by);
+        totalCommands = displayAddedCommand(commandList, totalCommands);
+        return totalCommands;
+    }
+
+    private static int ProcessEvent(String userCommand, Task[] commandList, int totalCommands) {
+        String fullDescription = userCommand.substring(6);
+        String[] descriptionPart1 =  fullDescription.split(" /from ");
+        String description = descriptionPart1[0];
+        String[] descriptionPart2 = descriptionPart1[1].split(" /to ");
+        String from = descriptionPart2[0];
+        String to = descriptionPart2[1];
+        commandList[totalCommands] = new Event(description, from, to);
+        totalCommands = displayAddedCommand(commandList, totalCommands);
+        return totalCommands;
+    }
+
+    private static int AddTask(Task[] commandList, int totalCommands, String userCommand) {
+        commandList[totalCommands] = new Task(userCommand);
+        totalCommands++;
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "added: " + userCommand);
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+        return totalCommands;
     }
 }
