@@ -1,12 +1,21 @@
 import java.util.Scanner;
 
+import exceptions.EmptyEntryException;
+import exceptions.InvalidCommandException;
+import exceptions.InvalidFormatException;
+import exceptions.InvalidIndexException;
+import tasks.Deadline;
+import tasks.Event;
+import tasks.Task;
+import tasks.Todo;
+
 public class YC {
 
     static final String BOT_NAME = "YC";
     static final int MAX_LIST_NUM = 100;
     static int totalCommands = 0;
 
-    public static void main(String[] args) throws InvalidCommandException{
+    public static void main(String[] args) throws InvalidCommandException {
         Scanner scanner = new Scanner(System.in);
         String userCommand;
         Task[] commandList = new Task[MAX_LIST_NUM];
