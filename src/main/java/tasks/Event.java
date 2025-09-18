@@ -17,6 +17,6 @@ public class Event extends Task {
     }
 
     public String toStorage() {
-        return "E | " + (isDone ? 1 : 0) + " | " + description;
+        return "E | " + (isDone ? 1 : 0) + " | " + description + " | from: " + from + " | to: " + to + ")";
     }
 }
