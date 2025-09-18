@@ -1,4 +1,8 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import java.util.ArrayList;
 import exceptions.EmptyEntryException;
@@ -14,11 +18,13 @@ public class YC {
 
     static final String BOT_NAME = "YC";
     static ArrayList<Task> commandList = new ArrayList<>();
+    private static final String FILE_PATH = "data/tasks.txt";
 
     public static void main(String[] args) throws InvalidCommandException {
         Scanner scanner = new Scanner(System.in);
         String userCommand;
 
+        loadTasks(FILE_PATH);
 
         displayWelcomeMessage();
 
@@ -33,16 +39,22 @@ public class YC {
                     displayList();
                 } else if (userCommand.toLowerCase().startsWith("mark")) {
                     markTask(userCommand);
+                    saveTasks(FILE_PATH);
                 } else if (userCommand.toLowerCase().startsWith("unmark")) {
                     unmarkTask(userCommand);
+                    saveTasks(FILE_PATH);
                 } else if (userCommand.toLowerCase().startsWith("delete")) {
                     deleteTask(userCommand);
+                    saveTasks(FILE_PATH);
                 } else if (userCommand.toLowerCase().startsWith("todo")) {
                     processTodo(userCommand);
+                    saveTasks(FILE_PATH);
                 } else if (userCommand.toLowerCase().startsWith("deadline")) {
                     processDeadline(userCommand);
+                    saveTasks(FILE_PATH);
                 } else if (userCommand.toLowerCase().startsWith("event")) {
                     processEvent(userCommand);
+                    saveTasks(FILE_PATH);
                 } else {
                     throw new InvalidCommandException("Please enter a valid command!");
                 }
@@ -60,6 +72,52 @@ public class YC {
         System.out.println("\t" + "Hello! I'm " + YC.BOT_NAME);
         System.out.println("\t" + "What can I do for you?");
         System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
+    private static void saveTasks(String filePath) {
+        try {
+            FileWriter fw = new FileWriter(filePath);
+            for (Task t : commandList) {
+                fw.write(t.toStorage() + System.lineSeparator());
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error occurs when saving: " + e.getMessage());
+        }
+    }
+
+    private static void loadTasks(String filePath) {
+        try {
+            File f = new File(filePath);
+            if (f.createNewFile()) {
+                System.out.println("tasks file has been created.");
+            }
+            Scanner s = new Scanner(f);
+            while (s.hasNext()) {
+                String line = s.nextLine();
+                String[] parts = line.split(" \\| ");
+                String part1 = parts[0];
+                int part2 = Integer.parseInt(parts[1]);
+                String description = parts[2];
+
+                Task t = null;
+                if (part1.equals("T")) {
+                    t = new Todo(description);
+                } else if (part1.equals("D")) {
+                    t = new Deadline(description, parts[3]);
+                } else if (part1.equals("E")) {
+                    t = new Event(description, parts[3], parts[4]);
+                }
+                if (part2 == 1) {
+                    t.markAsDone();
+                }
+                commandList.add(t);
+            }
+            s.close();
+        } catch (IOException e) {
+            System.out.println("Error occurs when loading: " + e.getMessage());
+        }
+
     }
 
     private static void displayByeMessage() {
