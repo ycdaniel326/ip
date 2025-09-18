@@ -13,4 +13,9 @@ public class Deadline extends Task {
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";
     }
+
+    @Override
+    public String toStorage() {
+        return "D | " + (isDone ? 1 : 0) + " | " + description;
+    }
 }
