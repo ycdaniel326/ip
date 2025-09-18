@@ -32,15 +32,17 @@ public class YC {
                 if (userCommand.equalsIgnoreCase("list")) {
                     displayList();
                 } else if (userCommand.toLowerCase().startsWith("mark")) {
-                    MarkTask(userCommand);
+                    markTask(userCommand);
                 } else if (userCommand.toLowerCase().startsWith("unmark")) {
-                    UnmarkTask(userCommand);
+                    unmarkTask(userCommand);
+                } else if (userCommand.toLowerCase().startsWith("delete")) {
+                    deleteTask(userCommand);
                 } else if (userCommand.toLowerCase().startsWith("todo")) {
-                    ProcessTodo(userCommand);
+                    processTodo(userCommand);
                 } else if (userCommand.toLowerCase().startsWith("deadline")) {
-                    ProcessDeadline(userCommand);
+                    processDeadline(userCommand);
                 } else if (userCommand.toLowerCase().startsWith("event")) {
-                    ProcessEvent(userCommand);
+                    processEvent(userCommand);
                 } else {
                     throw new InvalidCommandException("Please enter a valid command!");
                 }
@@ -74,7 +76,7 @@ public class YC {
         System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 
-    private static void MarkTask(String userCommand)
+    private static void markTask(String userCommand)
             throws InvalidIndexException {
         int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
         if (taskIndex < 0 || taskIndex >= commandList.size()) {
@@ -87,7 +89,7 @@ public class YC {
         System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 
-    private static void UnmarkTask(String userCommand)
+    private static void unmarkTask(String userCommand)
             throws InvalidIndexException {
         int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
         if (taskIndex < 0 || taskIndex >= commandList.size()) {
@@ -100,6 +102,21 @@ public class YC {
         System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 
+    private static void deleteTask(String userCommand)
+            throws InvalidIndexException {
+        int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
+        if (taskIndex < 0 || taskIndex >= commandList.size()) {
+            throw new InvalidIndexException("This is not a valid task index");
+        }
+        Task deletedTask = commandList.get(taskIndex);
+        commandList.remove(taskIndex);
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "Noted. I've removed this task:");
+        System.out.println("\t\t" + deletedTask.toString());
+        System.out.println("\t" + "Now you have " + commandList.size()+ " tasks in the list.");
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
     private static void displayAddedCommand() {
         System.out.println("\t" + "____________________________________________________________");
         System.out.println("\t" + "Got it. I've added this task:");
@@ -108,7 +125,7 @@ public class YC {
         System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 
-    private static void ProcessTodo(String userCommand)
+    private static void processTodo(String userCommand)
             throws EmptyEntryException {
         int TODO_CONTENT_INDEX = 5;
         if (userCommand.length() <= TODO_CONTENT_INDEX) {
@@ -119,7 +136,7 @@ public class YC {
         displayAddedCommand();
     }
 
-    private static void ProcessDeadline(String userCommand)
+    private static void processDeadline(String userCommand)
             throws EmptyEntryException, InvalidFormatException {
 
         int DEADLINE_CONTENT_INDEX = 9;
@@ -140,7 +157,7 @@ public class YC {
         displayAddedCommand();
     }
 
-    private static void ProcessEvent(String userCommand)
+    private static void processEvent(String userCommand)
             throws EmptyEntryException, InvalidFormatException {
         int EVENT_CONTENT_INDEX = 6;
         if (userCommand.length() <= EVENT_CONTENT_INDEX) {
