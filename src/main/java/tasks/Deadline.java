@@ -16,6 +16,6 @@ public class Deadline extends Task {
 
     @Override
     public String toStorage() {
-        return "D | " + (isDone ? 1 : 0) + " | " + description + " | by: " + by + ")";
+        return "D | " + (isDone ? 1 : 0) + " | " + description + " | " + by;
     }
 }
