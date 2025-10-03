@@ -1,5 +1,8 @@
 package tasks;
 
+/**
+ * Represents a To-do task with description and completion status.
+ */
 public class Todo extends Task {
 
     public Todo(String description) {

@@ -8,8 +8,20 @@ import tasks.Task;
 import tasks.Todo;
 import tasks.TaskList;
 
+/**
+ * Deals with the parsing and execution of user commands.
+ * Based on the user input, different methods will be executed after processing.
+ * Examples of commands are list (listing out the current task list) and event (adding an event).
+ */
 public class Parser {
 
+    /**
+     * Parses the user input and execute the corresponding method for user command.
+     *
+     * @param userCommand The command input by the user.
+     * @param tasks The TaskList that is dealing with.
+     * @param storage The Storage object that is used to save the tasks after each operation.
+     */
     public static void parse(String userCommand, TaskList tasks, Storage storage) {
         try {
             if (userCommand.equalsIgnoreCase("list")) {
@@ -94,8 +106,16 @@ public class Parser {
         System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 
+    /**
+     * Find and list all tasks that contain the keyword specified by user.
+     *
+     * @param userCommand The user command (which includes the keyword of tasks to find)
+     * @param tasks The TaskList that stores the tasks.
+     * @throws EmptyEntryException If the input is missing command description.
+     */
     private static void findTask(String userCommand, TaskList tasks)
             throws EmptyEntryException {
+        // "find " consists of 5 chars
         int FIND_CONTENT_INDEX = 5;
         if (userCommand.length() <= FIND_CONTENT_INDEX) {
             throw new EmptyEntryException();
@@ -126,8 +146,17 @@ public class Parser {
         System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 
+    /**
+     * Processes the command for To-Do tasks.
+     * Extracts the task description and adds the To-do task to the TaskList.
+     *
+     * @param userCommand The user command that contains the To-do task.
+     * @param tasks The TaskList that stores the tasks.
+     * @throws EmptyEntryException If the description is missing.
+     */
     private static void processTodo(String userCommand, TaskList tasks)
             throws EmptyEntryException {
+        // "todo " consists of 5 chars
         int TODO_CONTENT_INDEX = 5;
         if (userCommand.length() <= TODO_CONTENT_INDEX) {
             throw new EmptyEntryException();
@@ -137,9 +166,18 @@ public class Parser {
         displayAddedCommand(tasks);
     }
 
+    /**
+     * Processes the "deadline" command.
+     * Extracts the task description (with deadline specified) and adds the task with deadline to the TaskList.
+     *
+     * @param userCommand The user command that contains the task with deadline.
+     * @param tasks The TaskList that stores the tasks.
+     * @throws EmptyEntryException If the description is missing.
+     * @throws InvalidFormatException If the input format is invalid.
+     */
     private static void processDeadline(String userCommand, TaskList tasks)
             throws EmptyEntryException, InvalidFormatException {
-
+        //"deadline " consists of 9 chars
         int DEADLINE_CONTENT_INDEX = 9;
         if (userCommand.length() <= DEADLINE_CONTENT_INDEX) {
             throw new EmptyEntryException();
@@ -158,8 +196,18 @@ public class Parser {
         displayAddedCommand(tasks);
     }
 
+    /**
+     * Processes an "event" command.
+     * Extracts the task description, start time and end time, and adds the Event to TaskList.
+     *
+     * @param userCommand The user command that contains the event with start and end time.
+     * @param tasks The TaskList that stores the tasks.
+     * @throws EmptyEntryException If the description is missing.
+     * @throws InvalidFormatException If the input format is invalid.
+     */
     private static void processEvent(String userCommand, TaskList tasks)
             throws EmptyEntryException, InvalidFormatException {
+        //"event " consists of 6 chars
         int EVENT_CONTENT_INDEX = 6;
         if (userCommand.length() <= EVENT_CONTENT_INDEX) {
             throw new EmptyEntryException();

@@ -1,5 +1,8 @@
 package tasks;
 
+/**
+ * Represents a task with description, deadline and completion status.
+ */
 public class Deadline extends Task {
 
     protected String by;

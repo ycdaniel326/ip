@@ -1,5 +1,8 @@
 package tasks;
 
+/**
+ * Represents a general task.
+ */
 public abstract class Task {
     protected String description;
     protected boolean isDone;
@@ -19,10 +22,6 @@ public abstract class Task {
 
     public void markAsNotDone() {
         isDone = false;
-    }
-
-    public boolean isDone() {
-        return isDone;
     }
 
     public String toString() {

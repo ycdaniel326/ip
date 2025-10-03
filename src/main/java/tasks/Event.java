@@ -1,5 +1,8 @@
 package tasks;
 
+/**
+ * Represents an event with description, start time, end time, and completion status.
+ */
 public class Event extends Task {
 
     protected String from;
