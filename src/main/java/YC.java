@@ -1,241 +1,45 @@
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import exceptions.EmptyEntryException;
-import exceptions.InvalidCommandException;
-import exceptions.InvalidFormatException;
-import exceptions.InvalidIndexException;
-import tasks.Deadline;
-import tasks.Event;
-import tasks.Task;
-import tasks.Todo;
+import tasks.TaskList;
 
 public class YC {
 
-    static final String BOT_NAME = "YC";
-    static ArrayList<Task> commandList = new ArrayList<>();
-    private static final String FILE_PATH = "data/tasks.txt";
+    private Storage storage;
+    private Ui ui;
+    private TaskList tasks;
 
-    public static void main(String[] args) throws InvalidCommandException {
-        Scanner scanner = new Scanner(System.in);
-        String userCommand;
+    public YC(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        try {
+            tasks = new TaskList(storage.loadTasks());
+        } catch (Exception e) {
+            ui.showLoadingError();
+            tasks = new TaskList();
+        }
+    }
 
-        loadTasks(FILE_PATH);
-
-        displayWelcomeMessage();
-
-        while (true) {
-            userCommand = scanner.nextLine().trim();
+    public void run() {
+        ui.displayWelcomeMessage();
+        boolean isExit = false;
+        while (!isExit) {
             try {
-                if (userCommand.equalsIgnoreCase("bye")) {
-                    displayByeMessage();
-                    break;
+                String fullCommand = ui.readCommand();
+                if (fullCommand.equalsIgnoreCase("bye")) {
+                    isExit = true;
+                    ui.displayByeMessage();
                 }
-                if (userCommand.equalsIgnoreCase("list")) {
-                    displayList();
-                } else if (userCommand.toLowerCase().startsWith("mark")) {
-                    markTask(userCommand);
-                    saveTasks(FILE_PATH);
-                } else if (userCommand.toLowerCase().startsWith("unmark")) {
-                    unmarkTask(userCommand);
-                    saveTasks(FILE_PATH);
-                } else if (userCommand.toLowerCase().startsWith("delete")) {
-                    deleteTask(userCommand);
-                    saveTasks(FILE_PATH);
-                } else if (userCommand.toLowerCase().startsWith("todo")) {
-                    processTodo(userCommand);
-                    saveTasks(FILE_PATH);
-                } else if (userCommand.toLowerCase().startsWith("deadline")) {
-                    processDeadline(userCommand);
-                    saveTasks(FILE_PATH);
-                } else if (userCommand.toLowerCase().startsWith("event")) {
-                    processEvent(userCommand);
-                    saveTasks(FILE_PATH);
-                } else {
-                    throw new InvalidCommandException("Please enter a valid command!");
+                else {
+                    Parser.parse(fullCommand, tasks, storage);
                 }
-
-            } catch (EmptyEntryException | InvalidIndexException |
-                     InvalidFormatException | InvalidCommandException e ) {
-                System.out.println("\t" + e.getMessage());
+            } catch (Exception e) {
+               System.out.println(e.getMessage());
             }
-
         }
     }
-
-    private static void displayWelcomeMessage() {
-        System.out.println("\t" + "____________________________________________________________");
-        System.out.println("\t" + "Hello! I'm " + YC.BOT_NAME);
-        System.out.println("\t" + "What can I do for you?");
-        System.out.println("\t" + "____________________________________________________________" + "\n");
+    public static void main(String[] args) {
+        new YC("data/tasks.txt").run();
     }
 
-    private static void saveTasks(String filePath) {
-        try {
-            FileWriter fw = new FileWriter(filePath);
-            for (Task t : commandList) {
-                fw.write(t.toStorage() + System.lineSeparator());
-            }
-            fw.close();
-        } catch (IOException e) {
-            System.out.println("Error occurs when saving: " + e.getMessage());
-        }
-    }
-
-    private static void loadTasks(String filePath) {
-        try {
-            File f = new File(filePath);
-            if (f.createNewFile()) {
-                System.out.println("tasks file has been created.");
-            }
-            Scanner s = new Scanner(f);
-            while (s.hasNext()) {
-                String line = s.nextLine();
-                String[] parts = line.split(" \\| ");
-                String part1 = parts[0];
-                int part2 = Integer.parseInt(parts[1]);
-                String description = parts[2];
-
-                Task t = null;
-                if (part1.equals("T")) {
-                    t = new Todo(description);
-                } else if (part1.equals("D")) {
-                    t = new Deadline(description, parts[3]);
-                } else if (part1.equals("E")) {
-                    t = new Event(description, parts[3], parts[4]);
-                }
-                if (part2 == 1) {
-                    t.markAsDone();
-                }
-                commandList.add(t);
-            }
-            s.close();
-        } catch (IOException e) {
-            System.out.println("Error occurs when loading: " + e.getMessage());
-        }
-
-    }
-
-    private static void displayByeMessage() {
-        System.out.println("\t" + "____________________________________________________________");
-        System.out.println("\t" + "Bye. Hope to see you again soon!");
-        System.out.println("\t" + "____________________________________________________________" + "\n");
-    }
-
-    private static void displayList() {
-        System.out.println("\t" + "____________________________________________________________");
-        for  (int i = 0; i < commandList.size(); i++) {
-            System.out.println("\t" + (i+1) + commandList.get(i).toString());
-        }
-        System.out.println("\t" + "____________________________________________________________" + "\n");
-    }
-
-    private static void markTask(String userCommand)
-            throws InvalidIndexException {
-        int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
-        if (taskIndex < 0 || taskIndex >= commandList.size()) {
-            throw new InvalidIndexException("This is not a valid task index");
-        }
-        commandList.get(taskIndex).markAsDone();
-        System.out.println("\t" + "____________________________________________________________");
-        System.out.println("\t" + "Nice! I've marked this task as done:");
-        System.out.println("\t\t" + commandList.get(taskIndex).toString());
-        System.out.println("\t" + "____________________________________________________________" + "\n");
-    }
-
-    private static void unmarkTask(String userCommand)
-            throws InvalidIndexException {
-        int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
-        if (taskIndex < 0 || taskIndex >= commandList.size()) {
-            throw new InvalidIndexException("This is not a valid task index");
-        }
-        commandList.get(taskIndex).markAsNotDone();
-        System.out.println("\t" + "____________________________________________________________");
-        System.out.println("\t" + "OK, I've marked this task as not done yet:");
-        System.out.println("\t\t" + commandList.get(taskIndex).toString());
-        System.out.println("\t" + "____________________________________________________________" + "\n");
-    }
-
-    private static void deleteTask(String userCommand)
-            throws InvalidIndexException {
-        int taskIndex = Integer.parseInt(userCommand.split(" ")[1]) - 1;
-        if (taskIndex < 0 || taskIndex >= commandList.size()) {
-            throw new InvalidIndexException("This is not a valid task index");
-        }
-        Task deletedTask = commandList.get(taskIndex);
-        commandList.remove(taskIndex);
-        System.out.println("\t" + "____________________________________________________________");
-        System.out.println("\t" + "Noted. I've removed this task:");
-        System.out.println("\t\t" + deletedTask.toString());
-        System.out.println("\t" + "Now you have " + commandList.size()+ " tasks in the list.");
-        System.out.println("\t" + "____________________________________________________________" + "\n");
-    }
-
-    private static void displayAddedCommand() {
-        System.out.println("\t" + "____________________________________________________________");
-        System.out.println("\t" + "Got it. I've added this task:");
-        System.out.println("\t\t" + commandList.get(commandList.size()-1).toString());
-        System.out.println("\t" + "Now you have "+ commandList.size() + " tasks in the list.");
-        System.out.println("\t" + "____________________________________________________________" + "\n");
-    }
-
-    private static void processTodo(String userCommand)
-            throws EmptyEntryException {
-        int TODO_CONTENT_INDEX = 5;
-        if (userCommand.length() <= TODO_CONTENT_INDEX) {
-            throw new EmptyEntryException();
-        }
-        String description = userCommand.substring(TODO_CONTENT_INDEX);
-        commandList.add(new Todo(description));
-        displayAddedCommand();
-    }
-
-    private static void processDeadline(String userCommand)
-            throws EmptyEntryException, InvalidFormatException {
-
-        int DEADLINE_CONTENT_INDEX = 9;
-        if (userCommand.length() <= DEADLINE_CONTENT_INDEX) {
-            throw new EmptyEntryException();
-        }
-        String fullDescription = userCommand.substring(DEADLINE_CONTENT_INDEX);
-        if (!fullDescription.contains("/by")) {
-            throw new InvalidFormatException("You are missing a '/by' in the command.");
-        }
-        String[] descriptionParts =  fullDescription.split(" /by ");
-        if (descriptionParts.length != 2 || descriptionParts[0].isEmpty() ||  descriptionParts[1].isEmpty()) {
-            throw new InvalidFormatException("You should enter with the format: 'description' /by 'deadline'");
-        }
-        String description = descriptionParts[0];
-        String by = descriptionParts[1];
-        commandList.add(new Deadline(description, by));
-        displayAddedCommand();
-    }
-
-    private static void processEvent(String userCommand)
-            throws EmptyEntryException, InvalidFormatException {
-        int EVENT_CONTENT_INDEX = 6;
-        if (userCommand.length() <= EVENT_CONTENT_INDEX) {
-            throw new EmptyEntryException();
-        }
-        String fullDescription = userCommand.substring(EVENT_CONTENT_INDEX);
-        if (!fullDescription.contains("/from") || !fullDescription.contains("/to")) {
-            throw new InvalidFormatException("You are missing a '/from' or '/to' in the command.");
-        }
-        String[] descriptionPart1 =  fullDescription.split(" /from ");
-        if (descriptionPart1.length != 2 || descriptionPart1[0].isEmpty() ||  descriptionPart1[1].isEmpty()) {
-            throw new InvalidFormatException("You should enter with the format: 'description' /from 'start' /to 'end'");
-        }
-        String description = descriptionPart1[0];
-        String[] descriptionPart2 = descriptionPart1[1].split(" /to ");
-        if (descriptionPart2.length != 2 || descriptionPart2[0].isEmpty() ||  descriptionPart2[1].isEmpty()) {
-            throw new InvalidFormatException("You should enter with the format: 'description' /from 'start' /to 'end'");
-        }
-        String from = descriptionPart2[0];
-        String to = descriptionPart2[1];
-        commandList.add(new Event(description, from, to));
-        displayAddedCommand();
-    }
 }
+
+
+
