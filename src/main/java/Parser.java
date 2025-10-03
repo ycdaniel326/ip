@@ -23,6 +23,9 @@ public class Parser {
             } else if (userCommand.toLowerCase().startsWith("delete")) {
                 deleteTask(userCommand, tasks);
                 storage.saveTasks(tasks.getList());
+            } else if (userCommand.toLowerCase().startsWith("find")) {
+                findTask(userCommand, tasks);
+                storage.saveTasks(tasks.getList());
             } else if (userCommand.toLowerCase().startsWith("todo")) {
                 processTodo(userCommand, tasks);
                 storage.saveTasks(tasks.getList());
@@ -88,6 +91,30 @@ public class Parser {
         System.out.println("\t" + "Noted. I've removed this task:");
         System.out.println("\t\t" + deletedTask.toString());
         System.out.println("\t" + "Now you have " + tasks.size()+ " tasks in the list.");
+        System.out.println("\t" + "____________________________________________________________" + "\n");
+    }
+
+    private static void findTask(String userCommand, TaskList tasks)
+            throws EmptyEntryException {
+        int FIND_CONTENT_INDEX = 5;
+        if (userCommand.length() <= FIND_CONTENT_INDEX) {
+            throw new EmptyEntryException();
+        }
+        String taskWord = userCommand.substring(FIND_CONTENT_INDEX).toLowerCase();
+
+        System.out.println("\t" + "____________________________________________________________");
+        System.out.println("\t" + "Here are the matching tasks in your list:");
+        int count = 0;
+        for (int i = 0; i < tasks.size(); i++) {
+            String taskDescription = tasks.get(i).toString().toLowerCase();
+            if (taskDescription.contains(taskWord)) {
+                count++;
+                System.out.println("\t" + count + "." + tasks.get(i));
+            }
+        }
+        if (count == 0) {
+            System.out.println("\t" + "No matching tasks found.");
+        }
         System.out.println("\t" + "____________________________________________________________" + "\n");
     }
 
